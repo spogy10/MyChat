@@ -3,18 +3,21 @@ package poliv.jr.com.mychat.login;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModel;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.app.LoaderManager.LoaderCallbacks;
 
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -27,8 +30,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import poliv.jr.com.mychat.R;
 import poliv.jr.com.mychat.client.RequestSender;
@@ -36,7 +42,7 @@ import poliv.jr.com.mychat.client.RequestSender;
 /**
  * A login screen that offers login via email/tvPassword.
  */
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends AppCompatActivity {
 
 
 
@@ -46,6 +52,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
+
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     // UI references.
     private AutoCompleteTextView tvUserName;
@@ -66,11 +75,22 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         }).start();
 
+        sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
+        EmailsViewModel model = ViewModelProviders.of(this, new EmailsViewModelFactory(sharedPreferences, getString(R.string.autocomplete_email_set))).get(EmailsViewModel.class);
+
 
         // Set up the login form.
 
         tvUserName = (AutoCompleteTextView) findViewById(R.id.atvUsername);
-        populateAutoComplete();
+
+        model.getEmails().observe(this, new Observer<List<String>>() {
+            @Override
+            public void onChanged(@Nullable List<String> strings) {
+                addEmailsToAutoComplete(strings);
+            }
+        });
 
         tvPassword = (EditText) findViewById(R.id.password);
         tvPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -94,16 +114,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-    }
-
-    private void populateAutoComplete() {
-
-        //todo use shared preference to save previous user names
-        if (true) {
-            return;
-        }
-
-        getLoaderManager().initLoader(0, null, this);
     }
 
 
@@ -154,9 +164,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
+            saveEmailToAutoCompleteList(username);
             mAuthTask = new UserLoginTask(username, password);
             mAuthTask.execute((Void) null);
         }
+    }
+
+    private void saveEmailToAutoCompleteList(String email){
+        Set<String> tempSet = sharedPreferences.getStringSet(getString(R.string.autocomplete_email_set), new HashSet<String>());
+        tempSet.add(email);
+        editor.putStringSet(getString(R.string.autocomplete_email_set), tempSet).apply();
     }
 
     private boolean isUsernameValid(String username) {
@@ -205,40 +222,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-
-                // Select only email addresses.
-                ContactsContract.Contacts.Data.MIMETYPE +
-                        " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-                .CONTENT_ITEM_TYPE},
-
-                // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        List<String> emails = new ArrayList<>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            emails.add(cursor.getString(ProfileQuery.ADDRESS));
-            cursor.moveToNext();
-        }
-
-        addEmailsToAutoComplete(emails);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
-    }
-
     private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
         //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
         ArrayAdapter<String> adapter =
@@ -249,14 +232,64 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
 
-    private interface ProfileQuery {
-        String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
-        };
+    public static class EmailsViewModel extends ViewModel{
 
-        int ADDRESS = 0;
-        int IS_PRIMARY = 1;
+        private MutableLiveData<List<String>> emails;
+        private SharedPreferences sharedPreferences;
+        private String fileName;
+
+        public EmailsViewModel(SharedPreferences sharedPreferences, String fileName) {
+            this.sharedPreferences = sharedPreferences;
+            this.fileName = fileName;
+        }
+
+        public LiveData<List<String>> getEmails() {
+            if(emails == null) {
+                emails = new MutableLiveData<>();
+                loadEmails();
+            }
+            return emails;
+        }
+
+        private void loadEmails() {
+
+            try {
+                emails.setValue(new GetEmailList().execute(sharedPreferences, fileName).get());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public class EmailsViewModelFactory extends ViewModelProvider.NewInstanceFactory {
+
+        private SharedPreferences sharedPreferences;
+        private String fileName;
+
+
+        public EmailsViewModelFactory(SharedPreferences sharedPreferences, String fileName) {
+            this.sharedPreferences = sharedPreferences;
+            this.fileName = fileName;
+        }
+
+        @Override
+        public <T extends ViewModel> T create(Class<T> modelClass) {
+            return (T) new EmailsViewModel(sharedPreferences, fileName);
+        }
+    }
+
+    private static class GetEmailList extends AsyncTask<Object, Void, List<String>>{
+
+        @Override
+        protected List<String> doInBackground(Object... objects) {
+            SharedPreferences sharedPreferences = (SharedPreferences) objects[0];
+            String fileName = (String) objects[1];
+            Set<String> set = sharedPreferences.getStringSet(fileName, new HashSet<String>());
+
+            return new LinkedList<>(set);
+        }
     }
 
     /**

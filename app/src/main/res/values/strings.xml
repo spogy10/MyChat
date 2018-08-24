@@ -12,4 +12,13 @@
     <string name="error_field_required">This field is required</string>
 
     <string name="title_activity_contact_list">Contact List</string>
+    <string name="title_activity_uio">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="autocomplete_email_set">emailSet</string>
 </resources>
