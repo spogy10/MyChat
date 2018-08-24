@@ -10,7 +10,7 @@ import communication.DataCarrier;
 
 
 public class ClientConnectionManager extends Client implements Runnable {
-    private static final String HOST = "localhost";
+    private static final String HOST = "192.168.100.72";
     private static final int PORT = 4000;
     private Thread t;
 

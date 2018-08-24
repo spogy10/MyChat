@@ -17,6 +17,7 @@ public class Client {
     }
     
     public Client(String host, int port){
+        Log.d("Paul", "Start client");
         initConnection(host, port);
     }
 
@@ -25,20 +26,22 @@ public class Client {
         try{
             connection = new Socket(host, port);
             initConnectionStreams();
-            //System.out.println("connection successful");
             Log.d("Paul", "connection successful");
             return true;
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d("Paul", "connection unsuccessful "+e);
         }
         return false;
     }
 
     private void initConnectionStreams() throws IOException {
+
         if (connection != null && connection.isConnected()){
             os = new ObjectOutputStream(connection.getOutputStream());
             is = new ObjectInputStream(connection.getInputStream());
         }
+        Log.d("Paul", "stream initialised");
     }
 
     protected void closeConnection() {

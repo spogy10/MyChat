@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import poliv.jr.com.mychat.R;
+import poliv.jr.com.mychat.client.RequestSender;
 
 /**
  * A login screen that offers login via email/tvPassword.
@@ -55,6 +57,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("Paul", "thread started");
+                RequestSender r = RequestSender.getInstance();
+            }
+        }).start();
+
+
         // Set up the login form.
 
         tvUserName = (AutoCompleteTextView) findViewById(R.id.atvUsername);
