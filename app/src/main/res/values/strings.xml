@@ -4,9 +4,10 @@
     <!-- Strings related to login -->
     <string name="prompt_username">Username</string>
     <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_register">Register</string>
     <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_username">This username address is invalid</string>
+    <string name="error_invalid_username">This username is invalid. %s</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
@@ -21,4 +22,6 @@
         completions."
     </string>
     <string name="autocomplete_email_set">emailSet</string>
+    <string name="failed_to_login_user">Failed to login user:</string>
+    <string name="failed_to_create_user">Failed to create user:</string>
 </resources>

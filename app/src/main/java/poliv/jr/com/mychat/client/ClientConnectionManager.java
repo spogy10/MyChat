@@ -44,7 +44,7 @@ public class ClientConnectionManager extends Client implements Runnable {
         return success;
     }
 
-    public boolean responseCheck(DataCarrier response) {
+    public static boolean responseCheck(DataCarrier response) {
         if(!response.isRequest()) {
             if (response.getInfo().equals(DC.NO_ERROR)) {
                 Log.d("Paul", "NO ERROR");

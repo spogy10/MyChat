@@ -36,7 +36,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import communication.DC;
+import communication.DataCarrier;
 import poliv.jr.com.mychat.R;
+import poliv.jr.com.mychat.client.ClientConnectionManager;
 import poliv.jr.com.mychat.client.RequestSender;
 
 /**
@@ -93,7 +96,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         tvPassword = (EditText) findViewById(R.id.password);
-        tvPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        /*tvPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
@@ -102,15 +105,24 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 return false;
             }
-        });
+        });*/
 
         Button btSignIn = (Button) findViewById(R.id.btSignIn);
         btSignIn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                attemptLogin(true);
             }
         });
+
+        Button btRegister = (Button) findViewById(R.id.btRegister);
+        btRegister.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                attemptLogin(false);
+            }
+        });
+
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -122,7 +134,7 @@ public class LoginActivity extends AppCompatActivity {
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin() {
+    private void attemptLogin(boolean signIn) {
         if (mAuthTask != null) {
             return;
         }
@@ -151,7 +163,7 @@ public class LoginActivity extends AppCompatActivity {
             focusView = tvUserName;
             cancel = true;
         } else if (!isUsernameValid(username)) {
-            tvUserName.setError(getString(R.string.error_invalid_username));
+            //tvUserName.setError(getString(R.string.error_invalid_username));
             focusView = tvUserName;
             cancel = true;
         }
@@ -165,7 +177,7 @@ public class LoginActivity extends AppCompatActivity {
             // perform the user login attempt.
             showProgress(true);
             saveEmailToAutoCompleteList(username);
-            mAuthTask = new UserLoginTask(username, password);
+            mAuthTask = new UserLoginTask(username, password, signIn);
             mAuthTask.execute((Void) null);
         }
     }
@@ -176,14 +188,48 @@ public class LoginActivity extends AppCompatActivity {
         editor.putStringSet(getString(R.string.autocomplete_email_set), tempSet).apply();
     }
 
-    private boolean isUsernameValid(String username) {
+    private boolean isUsernameValid(String username) { //todo check for any illegal windows file name characters
+        String s = ""; //This username is invalid. %s   \ / : * ? " < > |
+        if(username.length() <= 2)
+            s = "Too short";
+        else if (username.contains("\\"))
+            s = "Cannot contain \\";
+        else if (username.contains("/"))
+            s = "Cannot contain /";
+        else if (username.contains(":"))
+            s = "Cannot contain :";
+        else if (username.contains("*"))
+            s = "Cannot contain *";
+        else if (username.contains("?"))
+            s = "Cannot contain ?";
+        else if (username.contains("\""))
+            s = "Cannot contain \"";
+        else if (username.contains("<"))
+            s = "Cannot contain <";
+        else if (username.contains(">"))
+            s = "Cannot contain >";
+        else if (username.contains("|"))
+            s = "Cannot contain |";
+        else
+            return true;
 
-        return username.length() > 2;
+
+
+
+
+
+        tvUserName.setError(getString(R.string.error_invalid_username, s));
+
+        return false;
     }
 
     private boolean isPasswordValid(String password) {
 
         return password.length() > 4;
+    }
+
+    private void displayError(String error){ //todo use to display error message
+
     }
 
     /**
@@ -300,25 +346,40 @@ public class LoginActivity extends AppCompatActivity {
 
         private final String username;
         private final String password;
+        private boolean signIn;
+        private String error;
 
-        UserLoginTask(String email, String password) {
+        UserLoginTask(String email, String password, boolean signIn) {
             username = email;
             this.password = password;
+            this.signIn = signIn;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
 
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
+            RequestSender rs = RequestSender.getInstance();
+
+            if(signIn) {// TODO: attempt authentication against a network service.
+
+                DataCarrier response = rs.loginUser(username, password);
+                if(RequestSender.responseCheck(response) && (response.getData() != null) ){
+                    //todo get user info and login
+                }else {
+                    error = getString(R.string.failed_to_login_user) +response.getInfo();
+                    return false;
+                }
+
+            }else{
+                DataCarrier response = rs.registerUser(username, password);
+                if(RequestSender.responseCheck(response) && (response.getData() != null) && ((Boolean)response.getData()) ){ // TODO: register the new account here.
+                    //todo get user info and login
+                }else {
+                    error = getString(R.string.failed_to_create_user) +response.getInfo();
+                    return false;
+                }
             }
 
-
-            // TODO: register the new account here.
             return true;
         }
 
@@ -330,8 +391,11 @@ public class LoginActivity extends AppCompatActivity {
             if (success) {
                 finish();
             } else {
-                tvPassword.setError(getString(R.string.error_incorrect_password));
-                tvPassword.requestFocus();
+                displayError(error);
+                if(error.equals(DC.INCORRECT_PASSWORD)) {
+                    tvPassword.setError(getString(R.string.error_incorrect_password));
+                    tvPassword.requestFocus();
+                }
             }
         }
 
