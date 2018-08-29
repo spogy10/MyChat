@@ -3,6 +3,7 @@ package poliv.jr.com.mychat.login;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
@@ -10,6 +11,7 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -38,9 +40,12 @@ import java.util.concurrent.ExecutionException;
 
 import communication.DC;
 import communication.DataCarrier;
+import model.User;
+import poliv.jr.com.mychat.MyChat;
 import poliv.jr.com.mychat.R;
 import poliv.jr.com.mychat.client.ClientConnectionManager;
 import poliv.jr.com.mychat.client.RequestSender;
+import poliv.jr.com.mychat.contactlist.ContactListActivity;
 
 /**
  * A login screen that offers login via email/tvPassword.
@@ -69,14 +74,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("Paul", "thread started");
-                RequestSender r = RequestSender.getInstance();
-            }
-        }).start();
 
         sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
@@ -365,6 +362,8 @@ public class LoginActivity extends AppCompatActivity {
                 DataCarrier response = rs.loginUser(username, password);
                 if(RequestSender.responseCheck(response) && (response.getData() != null) ){
                     //todo get user info and login
+                    MyChat.myUser = (User) response.getData();
+                    startActivity(new Intent(LoginActivity.this, ContactListActivity.class));
                 }else {
                     error = getString(R.string.failed_to_login_user) +response.getInfo();
                     return false;
@@ -374,6 +373,8 @@ public class LoginActivity extends AppCompatActivity {
                 DataCarrier response = rs.registerUser(username, password);
                 if(RequestSender.responseCheck(response) && (response.getData() != null) && ((Boolean)response.getData()) ){ // TODO: register the new account here.
                     //todo get user info and login
+                    MyChat.myUser = new User(username, password);
+                    startActivity(new Intent(LoginActivity.this, ContactListActivity.class));
                 }else {
                     error = getString(R.string.failed_to_create_user) +response.getInfo();
                     return false;
