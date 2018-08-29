@@ -10,9 +10,10 @@ import communication.DataCarrier;
 
 
 public class ClientConnectionManager extends Client implements Runnable {
-    private static final String HOST = "192.168.100.72";
+    private static final String HOST = "10.0.2.2";
     private static final int PORT = 4000;
     private Thread t;
+    protected static NetworkNotificationInterface nNI;
 
     private String action = "";
     private DataCarrier carrier = null;
@@ -24,8 +25,14 @@ public class ClientConnectionManager extends Client implements Runnable {
 
     protected ClientConnectionManager(){
         super(HOST, PORT);
-        t = new Thread(this);
-        t.start();
+        if(os != null && is != null){
+            t = new Thread(this);
+            t.start();
+        }else{
+            Log.d("Paul", "Streams are null");
+            nNI.showToast("Not connected to server");
+        }
+
     }
 
     public Object readObject() throws IOException, ClassNotFoundException {
@@ -86,6 +93,10 @@ public class ClientConnectionManager extends Client implements Runnable {
 
     protected DataCarrier sendRequest(DataCarrier request){
         DataCarrier response = new DataCarrier(DC.SERVER_CONNECTION_ERROR, false);
+        if(os == null || is == null) {
+            nNI.showToast("Not connected to server, please restart app");
+            return response;
+        }
         try{
             os.writeObject(request);
             Log.d("Paul", "Request: "+request.getInfo()+" sent");
@@ -143,5 +154,9 @@ public class ClientConnectionManager extends Client implements Runnable {
 
     private void receiveMessage() {
         receiveRequest(action);
+    }
+
+    public static void setnNI(NetworkNotificationInterface nNI) {
+        ClientConnectionManager.nNI = nNI;
     }
 }

@@ -9,8 +9,16 @@ public class RequestSender extends ClientConnectionManager {
 
 
     public final static RequestSender getInstance(){
-        if (instance == null)
+        if(instance == null)
+            nNI.showToast("Attempting to connect to Server");
+        return instance;
+    }
+
+    public final static RequestSender getInstance(NetworkNotificationInterface nNi){
+        if (instance == null){
+            RequestSender.nNI = nNi;
             instance = new RequestSender();
+        }
 
         return instance;
     }

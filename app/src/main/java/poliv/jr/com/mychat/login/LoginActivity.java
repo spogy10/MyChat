@@ -46,6 +46,7 @@ import poliv.jr.com.mychat.R;
 import poliv.jr.com.mychat.client.ClientConnectionManager;
 import poliv.jr.com.mychat.client.RequestSender;
 import poliv.jr.com.mychat.contactlist.ContactListActivity;
+import poliv.jr.com.mychat.dialog.OkDialog;
 
 /**
  * A login screen that offers login via email/tvPassword.
@@ -88,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
         model.getEmails().observe(this, new Observer<List<String>>() {
             @Override
             public void onChanged(@Nullable List<String> strings) {
-                addEmailsToAutoComplete(strings);
+                addEmailsToAutoComplete(strings); //TODO CHECK THIS
             }
         });
 
@@ -225,8 +226,8 @@ public class LoginActivity extends AppCompatActivity {
         return password.length() > 4;
     }
 
-    private void displayError(String error){ //todo use to display error message
-
+    private void displayError(String error){
+        OkDialog.setDialog(getFragmentManager(), error);
     }
 
     /**
@@ -356,6 +357,10 @@ public class LoginActivity extends AppCompatActivity {
         protected Boolean doInBackground(Void... params) {
 
             RequestSender rs = RequestSender.getInstance();
+            if(rs == null){
+                cancel(true);
+                return null;
+            }
 
             if(signIn) {// TODO: attempt authentication against a network service.
 
@@ -392,11 +397,11 @@ public class LoginActivity extends AppCompatActivity {
             if (success) {
                 finish();
             } else {
-                displayError(error);
-                if(error.equals(DC.INCORRECT_PASSWORD)) {
+                if(error.equals(getString(R.string.failed_to_login_user) +DC.INCORRECT_PASSWORD)) {
                     tvPassword.setError(getString(R.string.error_incorrect_password));
                     tvPassword.requestFocus();
-                }
+                }else
+                    displayError(error);
             }
         }
 
