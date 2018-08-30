@@ -89,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
         model.getEmails().observe(this, new Observer<List<String>>() {
             @Override
             public void onChanged(@Nullable List<String> strings) {
-                addEmailsToAutoComplete(strings); //TODO CHECK THIS
+                addEmailsToAutoComplete(strings);
             }
         });
 
@@ -180,13 +180,14 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void saveEmailToAutoCompleteList(String email){
+    private void saveEmailToAutoCompleteList(String email){ Log.d("Paul", "run it");
         Set<String> tempSet = sharedPreferences.getStringSet(getString(R.string.autocomplete_email_set), new HashSet<String>());
         tempSet.add(email);
+        editor.remove(getString(R.string.autocomplete_email_set)).apply();
         editor.putStringSet(getString(R.string.autocomplete_email_set), tempSet).apply();
     }
 
-    private boolean isUsernameValid(String username) { //todo check for any illegal windows file name characters
+    private boolean isUsernameValid(String username) {
         String s = ""; //This username is invalid. %s   \ / : * ? " < > |
         if(username.length() <= 2)
             s = "Too short";
@@ -362,11 +363,11 @@ public class LoginActivity extends AppCompatActivity {
                 return null;
             }
 
-            if(signIn) {// TODO: attempt authentication against a network service.
+            if(signIn) {
 
                 DataCarrier response = rs.loginUser(username, password);
                 if(RequestSender.responseCheck(response) && (response.getData() != null) ){
-                    //todo get user info and login
+
                     MyChat.myUser = (User) response.getData();
                     startActivity(new Intent(LoginActivity.this, ContactListActivity.class));
                 }else {
@@ -376,8 +377,7 @@ public class LoginActivity extends AppCompatActivity {
 
             }else{
                 DataCarrier response = rs.registerUser(username, password);
-                if(RequestSender.responseCheck(response) && (response.getData() != null) && ((Boolean)response.getData()) ){ // TODO: register the new account here.
-                    //todo get user info and login
+                if(RequestSender.responseCheck(response) && (response.getData() != null) && ((Boolean)response.getData()) ){
                     MyChat.myUser = new User(username, password);
                     startActivity(new Intent(LoginActivity.this, ContactListActivity.class));
                 }else {
