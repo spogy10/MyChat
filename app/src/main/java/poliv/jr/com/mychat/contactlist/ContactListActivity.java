@@ -2,20 +2,21 @@ package poliv.jr.com.mychat.contactlist;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Toast;
 
 import poliv.jr.com.mychat.MyChat;
 import poliv.jr.com.mychat.R;
+import poliv.jr.com.mychat.contactlist.adapter.ContactsViewAdapter;
 
 public class ContactListActivity extends AppCompatActivity {
 
 
     RecyclerView recyclerView;
+    ContactsViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +34,9 @@ public class ContactListActivity extends AppCompatActivity {
         });
 
         recyclerView = findViewById(R.id.rvContactList);
-        Toast.makeText(this, "Username: "+MyChat.myUser.getUserName()+", Passsword: "+MyChat.myUser.getPassword(), Toast.LENGTH_SHORT).show();
+        LinearLayoutManager lm = new LinearLayoutManager(this);
+        adapter = new ContactsViewAdapter(this);
+        recyclerView.setAdapter(adapter);
 
     }
 

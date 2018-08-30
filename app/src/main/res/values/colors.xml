@@ -3,4 +3,7 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="contact_offline">#FFFFFF</color>
+    <color name="contact_online">#44f737</color>
 </resources>
