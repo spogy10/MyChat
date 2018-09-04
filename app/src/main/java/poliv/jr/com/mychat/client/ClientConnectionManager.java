@@ -141,6 +141,7 @@ public class ClientConnectionManager extends Client implements Runnable {
     }
 
     private void caseStatements() {
+        receiveRequest(action);
         switch (action){ //requests from server such as getting message
             case DC.RECEIVE_MESSAGE:
                 receiveMessage();
@@ -157,12 +158,14 @@ public class ClientConnectionManager extends Client implements Runnable {
     }
 
     private void contactOffline() {
-        receiveRequest(action);
+        String userName = (String) carrier.getData();
+        Log.d("Paul", userName+" is not online");
 
     }
 
     private void contactOnline() {
-        receiveRequest(action);
+        String userName = (String) carrier.getData();
+        Log.d("Paul", userName+" is now online");
     }
 
     private void receiveRequest(String request){
@@ -170,7 +173,6 @@ public class ClientConnectionManager extends Client implements Runnable {
     }
 
     private void receiveMessage() {
-        receiveRequest(action);
     }
 
     public static void setnNI(NetworkNotificationInterface nNI) {
