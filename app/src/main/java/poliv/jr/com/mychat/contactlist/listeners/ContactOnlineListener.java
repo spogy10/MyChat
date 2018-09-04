@@ -1,7 +1,7 @@
 package poliv.jr.com.mychat.contactlist.listeners;
 
 public interface ContactOnlineListener {
-    void onContactOnline();
+    void onContactOnline(String contactName);
 
-    void onContactOffline();
+    void onContactOffline(String contactName);
 }

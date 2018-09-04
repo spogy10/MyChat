@@ -7,6 +7,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import communication.DC;
 import communication.DataCarrier;
+import poliv.jr.com.mychat.contactlist.listeners.ContactAddedListener;
+import poliv.jr.com.mychat.contactlist.listeners.ContactOnlineListener;
+import poliv.jr.com.mychat.contactlist.listeners.MessageNotification;
 
 
 public class ClientConnectionManager extends Client implements Runnable {
@@ -18,6 +21,9 @@ public class ClientConnectionManager extends Client implements Runnable {
     private String action = "";
     private DataCarrier carrier = null;
     private DataCarrier response = null;
+    private ContactAddedListener contactAddedListener = null;
+    private ContactOnlineListener contactOnlineListener = null;
+    private MessageNotification messageNotificationListener = null;
 
     DataCarrier tempResponseHolder;
     AtomicBoolean unreadResponse = new AtomicBoolean(false);
@@ -33,6 +39,30 @@ public class ClientConnectionManager extends Client implements Runnable {
             nNI.showToast("Not connected to server");
         }
 
+    }
+
+    public void removeContactAddedListener() {
+        contactAddedListener = null;
+    }
+
+    public void setContactAddedListener(ContactAddedListener contactAddedListener) {
+        this.contactAddedListener = contactAddedListener;
+    }
+
+    public void removeContactOnlineListener() {
+        contactOnlineListener = null;
+    }
+
+    public void setContactOnlineListener(ContactOnlineListener contactOnlineListener) {
+        this.contactOnlineListener = contactOnlineListener;
+    }
+
+    public void removeMessageNotificationListener() {
+        messageNotificationListener = null;
+    }
+
+    public void setMessageNotificationListener(MessageNotification messageNotificationListener) {
+        this.messageNotificationListener = messageNotificationListener;
     }
 
     public Object readObject() throws IOException, ClassNotFoundException {
@@ -160,6 +190,8 @@ public class ClientConnectionManager extends Client implements Runnable {
     private void contactOffline() {
         String userName = (String) carrier.getData();
         Log.d("Paul", userName+" is not online");
+        if(contactOnlineListener != null)
+            contactOnlineListener.onContactOffline(userName);
 
     }
 
