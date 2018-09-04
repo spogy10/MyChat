@@ -145,7 +145,24 @@ public class ClientConnectionManager extends Client implements Runnable {
             case DC.RECEIVE_MESSAGE:
                 receiveMessage();
                 break;
+
+            case DC.CONTACT_ONLINE:
+                contactOnline();
+                break;
+
+            case DC.CONTACT_OFFLINE:
+                contactOffline();
+                break;
         }
+    }
+
+    private void contactOffline() {
+        receiveRequest(action);
+
+    }
+
+    private void contactOnline() {
+        receiveRequest(action);
     }
 
     private void receiveRequest(String request){
