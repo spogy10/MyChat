@@ -1,5 +1,6 @@
 package poliv.jr.com.mychat.client;
 
+import android.os.Handler;
 import android.util.Log;
 
 import java.io.IOException;
@@ -7,9 +8,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import communication.DC;
 import communication.DataCarrier;
-import poliv.jr.com.mychat.contactlist.listeners.ContactAddedListener;
-import poliv.jr.com.mychat.contactlist.listeners.ContactOnlineListener;
-import poliv.jr.com.mychat.contactlist.listeners.MessageNotification;
+import model.Message;
+import poliv.jr.com.mychat.MyChat;
+import poliv.jr.com.mychat.client.listeners.ContactAddedListener;
+import poliv.jr.com.mychat.client.listeners.ContactListListener;
+import poliv.jr.com.mychat.client.listeners.ContactOnlineListener;
+import poliv.jr.com.mychat.client.listeners.MessageNotification;
 
 
 public class ClientConnectionManager extends Client implements Runnable {
@@ -24,6 +28,7 @@ public class ClientConnectionManager extends Client implements Runnable {
     private ContactAddedListener contactAddedListener = null;
     private ContactOnlineListener contactOnlineListener = null;
     private MessageNotification messageNotificationListener = null;
+    private Handler handler;
 
     DataCarrier tempResponseHolder;
     AtomicBoolean unreadResponse = new AtomicBoolean(false);
@@ -39,6 +44,23 @@ public class ClientConnectionManager extends Client implements Runnable {
             nNI.showToast("Not connected to server");
         }
 
+    }
+
+    protected ClientConnectionManager(Handler handler){
+        super();
+        this.handler = handler;
+    }
+
+    public void setContactListListener(ContactListListener listener){
+        contactOnlineListener = listener;
+        contactAddedListener = listener;
+        messageNotificationListener = listener;
+    }
+
+    public void removerContactListListener(){
+        contactOnlineListener = null;
+        contactAddedListener = null;
+        messageNotificationListener = null;
     }
 
     public void removeContactAddedListener() {
@@ -189,6 +211,7 @@ public class ClientConnectionManager extends Client implements Runnable {
 
     private void contactOffline() {
         String userName = (String) carrier.getData();
+        MyChat.myUser.getContacts().put(userName, false);
         Log.d("Paul", userName+" is not online");
         if(contactOnlineListener != null)
             contactOnlineListener.onContactOffline(userName);
@@ -197,14 +220,21 @@ public class ClientConnectionManager extends Client implements Runnable {
 
     private void contactOnline() {
         String userName = (String) carrier.getData();
+        MyChat.myUser.getContacts().put(userName, true);
         Log.d("Paul", userName+" is now online");
+        if(contactOnlineListener != null)
+            contactOnlineListener.onContactOnline(userName);
     }
 
     private void receiveRequest(String request){
-        System.out.println("Request: "+request+" received");
+        Log.d("Paul","Request: "+request+" received");
     }
 
     private void receiveMessage() {
+        Message receivedMessage = (Message) carrier.getData();
+        Log.d("Paul", "Received a message from "+receivedMessage.getSender());
+        if(messageNotificationListener != null)
+            messageNotificationListener.messageReceived(receivedMessage);
     }
 
     public static void setnNI(NetworkNotificationInterface nNI) {

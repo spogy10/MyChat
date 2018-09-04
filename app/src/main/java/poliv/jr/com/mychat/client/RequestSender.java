@@ -1,5 +1,7 @@
 package poliv.jr.com.mychat.client;
 
+import android.os.Handler;
+
 import communication.DC;
 import communication.DataCarrier;
 
@@ -14,10 +16,10 @@ public class RequestSender extends ClientConnectionManager {
         return instance;
     }
 
-    public final static RequestSender getInstance(NetworkNotificationInterface nNi){
+    public final static RequestSender getInstance(NetworkNotificationInterface nNi, Handler handler){
         if (instance == null){
             RequestSender.nNI = nNi;
-            instance = new RequestSender();
+            instance = new RequestSender(/*handler*/);
         }
 
         return instance;
@@ -25,6 +27,10 @@ public class RequestSender extends ClientConnectionManager {
 
     private RequestSender(){
         super();
+    }
+
+    private RequestSender(Handler handler){
+        super(handler);
     }
 
     public DataCarrier loginUser(String userName, String password){

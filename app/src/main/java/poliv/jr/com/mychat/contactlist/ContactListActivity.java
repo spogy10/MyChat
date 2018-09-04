@@ -1,6 +1,7 @@
 package poliv.jr.com.mychat.contactlist;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,19 +9,26 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import model.Message;
 import poliv.jr.com.mychat.MyChat;
 import poliv.jr.com.mychat.R;
+import poliv.jr.com.mychat.client.RequestSender;
+import poliv.jr.com.mychat.client.listeners.ContactListListener;
 import poliv.jr.com.mychat.contactlist.adapter.ContactsViewAdapter;
 
-public class ContactListActivity extends AppCompatActivity {
+public class ContactListActivity extends AppCompatActivity implements ContactListListener {
 
 
-    RecyclerView recyclerView;
-    ContactsViewAdapter adapter;
+    private RecyclerView recyclerView;
+    private ContactsViewAdapter adapter;
+    private RequestSender rs = RequestSender.getInstance();
+    private Handler handler;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        handler = new Handler(getMainLooper());
         setContentView(R.layout.activity_contact_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -41,4 +49,51 @@ public class ContactListActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        rs.setContactListListener(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        rs.removerContactListListener();
+    }
+
+    @Override
+    public void onContactAdded() {
+
+    }
+
+    @Override
+    public void onContactRemoved() {
+
+    }
+
+    @Override
+    public void onContactOnline(final String contactName) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                adapter.contactOnline(contactName);
+            }
+        });
+    }
+
+    @Override
+    public void onContactOffline(final String contactName) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                adapter.contactOnline(contactName);
+            }
+        });
+
+    }
+
+    @Override
+    public void messageReceived(Message receivedMessage) {
+
+    }
 }

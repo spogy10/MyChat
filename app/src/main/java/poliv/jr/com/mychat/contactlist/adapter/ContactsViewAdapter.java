@@ -43,6 +43,22 @@ public class ContactsViewAdapter extends RecyclerView.Adapter<ContactsViewAdapte
         return MyChat.myUser.getContacts().size();
     }
 
+    public void contactOnline(String userName){
+        notifyItemChanged(contactUserNames.indexOf(userName));
+    }
+
+    public void contactAdded(String userName){
+        contactUserNames.add(userName);
+        notifyItemInserted(contactUserNames.size() - 1);
+    }
+
+    public void contactRemoved(String userName){
+        int position = contactUserNames.indexOf(userName);
+        contactUserNames.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position,contactUserNames.size());
+    }
+
     protected class ViewHolder extends RecyclerView.ViewHolder{
 
         CircleImageView cvProfilePic;

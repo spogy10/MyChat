@@ -27,7 +27,7 @@ public class MyChat extends Application implements NetworkNotificationInterface 
             @Override
             public void run() {
                 Log.d("Paul", "network thread started");
-                RequestSender.getInstance(MyChat.this);
+                RequestSender.getInstance(MyChat.this, handler);
             }
         });
 

@@ -1,4 +1,4 @@
-package poliv.jr.com.mychat.contactlist.listeners;
+package poliv.jr.com.mychat.client.listeners;
 
 public interface ContactOnlineListener {
     void onContactOnline(String contactName);
