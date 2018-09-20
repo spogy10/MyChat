@@ -24,4 +24,8 @@
     <string name="autocomplete_email_set">emailSet</string>
     <string name="failed_to_login_user">Failed to login user: </string>
     <string name="failed_to_create_user">Failed to create user: </string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_contact">Add Contact</string>
+    <string name="add">Add</string>
 </resources>

@@ -15,6 +15,7 @@ import poliv.jr.com.mychat.R;
 import poliv.jr.com.mychat.client.RequestSender;
 import poliv.jr.com.mychat.client.listeners.ContactListListener;
 import poliv.jr.com.mychat.contactlist.adapter.ContactsViewAdapter;
+import poliv.jr.com.mychat.dialog.AddContactDialog;
 
 public class ContactListActivity extends AppCompatActivity implements ContactListListener {
 
@@ -38,6 +39,8 @@ public class ContactListActivity extends AppCompatActivity implements ContactLis
             @Override
             public void onClick(View view) {
                 //todo: add contact
+                AddContactDialog addContactDialog = new AddContactDialog();
+                addContactDialog.show(getFragmentManager(), "");
             }
         });
 
