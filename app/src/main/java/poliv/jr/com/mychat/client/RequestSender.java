@@ -16,10 +16,10 @@ public class RequestSender extends ClientConnectionManager {
         return instance;
     }
 
-    public final static RequestSender getInstance(NetworkNotificationInterface nNi, Handler handler){
+    public final static RequestSender getInstance(NetworkNotificationInterface nNi){
         if (instance == null){
             RequestSender.nNI = nNi;
-            instance = new RequestSender(/*handler*/);
+            instance = new RequestSender();
         }
 
         return instance;
@@ -27,10 +27,6 @@ public class RequestSender extends ClientConnectionManager {
 
     private RequestSender(){
         super();
-    }
-
-    private RequestSender(Handler handler){
-        super(handler);
     }
 
     public DataCarrier loginUser(String userName, String password){
@@ -42,6 +38,18 @@ public class RequestSender extends ClientConnectionManager {
 
     public DataCarrier registerUser(String userName, String password){
         DataCarrier<String[]> dataCarrier = new DataCarrier<>(DC.REGISTER_USER, new String[]{userName, password}, true);
+
+        return sendRequest(dataCarrier);
+    }
+
+    public DataCarrier addContact(String userName){
+        DataCarrier<String> dataCarrier = new DataCarrier<>(DC.ADD_CONTACT, userName, true);
+
+        return sendRequest(dataCarrier);
+    }
+
+    public DataCarrier removeContact(String userName){
+        DataCarrier<String> dataCarrier = new DataCarrier<>(DC.REMOVE_CONTACT, userName, true);
 
         return sendRequest(dataCarrier);
     }

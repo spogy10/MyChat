@@ -124,6 +124,14 @@ public class LoginActivity extends AppCompatActivity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        autoSignInUser("poliver", "poliver");
+    }
+
+    private void autoSignInUser(String userName, String password) {
+        tvUserName.setText(userName);
+        tvPassword.setText(password);
+        attemptLogin(true);
     }
 
 

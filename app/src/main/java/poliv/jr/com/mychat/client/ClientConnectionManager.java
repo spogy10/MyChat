@@ -28,7 +28,6 @@ public class ClientConnectionManager extends Client implements Runnable {
     private ContactAddedListener contactAddedListener = null;
     private ContactOnlineListener contactOnlineListener = null;
     private MessageNotification messageNotificationListener = null;
-    private Handler handler;
 
     DataCarrier tempResponseHolder;
     AtomicBoolean unreadResponse = new AtomicBoolean(false);
@@ -44,11 +43,6 @@ public class ClientConnectionManager extends Client implements Runnable {
             nNI.showToast("Not connected to server");
         }
 
-    }
-
-    protected ClientConnectionManager(Handler handler){
-        super();
-        this.handler = handler;
     }
 
     public void setContactListListener(ContactListListener listener){
@@ -206,6 +200,14 @@ public class ClientConnectionManager extends Client implements Runnable {
             case DC.CONTACT_OFFLINE:
                 contactOffline();
                 break;
+
+            case DC.ADD_CONTACT:
+                addContact();
+                break;
+
+            case DC.REMOVE_CONTACT:
+                removeContact();
+                break;
         }
     }
 
@@ -224,6 +226,24 @@ public class ClientConnectionManager extends Client implements Runnable {
         Log.d("Paul", userName+" is now online");
         if(contactOnlineListener != null)
             contactOnlineListener.onContactOnline(userName);
+    }
+
+    private void addContact(){
+        Object[] contact = (Object[]) carrier.getData();
+        String userName = (String) contact[0];
+        Boolean online = (Boolean) contact[1];
+        MyChat.myUser.getContacts().put(userName, online);
+        Log.d("Paul", userName+" is now added and "+online);
+        if(contactAddedListener != null)
+            contactAddedListener.onContactAdded(userName);
+    }
+
+    private void removeContact(){
+        String userName = (String) carrier.getData();
+        MyChat.myUser.getContacts().remove(userName);
+        Log.d("Paul", userName+" is now removed");
+        if(contactAddedListener != null)
+            contactAddedListener.onContactRemoved(userName);
     }
 
     private void receiveRequest(String request){

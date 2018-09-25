@@ -1,7 +1,7 @@
 package poliv.jr.com.mychat.client.listeners;
 
 public interface ContactAddedListener {
-    void onContactAdded();
+    void onContactAdded(String userName);
 
-    void onContactRemoved();
+    void onContactRemoved(String userName);
 }

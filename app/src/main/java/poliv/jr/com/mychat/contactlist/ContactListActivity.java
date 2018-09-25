@@ -65,13 +65,23 @@ public class ContactListActivity extends AppCompatActivity implements ContactLis
     }
 
     @Override
-    public void onContactAdded() {
-
+    public void onContactAdded(final String userName) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                adapter.contactAdded(userName);
+            }
+        });
     }
 
     @Override
-    public void onContactRemoved() {
-
+    public void onContactRemoved(final String userName) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                adapter.contactRemoved(userName);
+            }
+        });
     }
 
     @Override
