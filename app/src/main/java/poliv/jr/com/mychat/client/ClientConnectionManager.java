@@ -237,7 +237,7 @@ public class ClientConnectionManager extends Client implements Runnable {
         String userName = (String) contact[0];
         Boolean online = (Boolean) contact[1];
         MyChat.myUser.getContacts().put(userName, online);
-        Log.d("Paul", userName+" is now added and "+online);
+        Log.d("Paul", userName+" is now added and "+ (online? "online" : "offline") );
         if(contactAddedListener != null)
             contactAddedListener.onContactAdded(userName);
     }
