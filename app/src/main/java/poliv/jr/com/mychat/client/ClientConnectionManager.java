@@ -122,6 +122,10 @@ public class ClientConnectionManager extends Client implements Runnable {
 
     protected DataCarrier sendRequest(DataCarrier request, boolean responseRequired){
         DataCarrier response = new DataCarrier(DC.SERVER_CONNECTION_ERROR, false);
+        if(os == null || is == null) {
+            nNI.showToast("Not connected to server, please restart app");
+            return response;
+        }
         try{
             os.writeObject(request);
             Log.d("Paul", "Request: "+request.getInfo()+" sent");
