@@ -1,6 +1,9 @@
 package poliv.jr.com.mychat.client;
 
+import android.os.AsyncTask;
 import android.os.Handler;
+
+import java.util.concurrent.ExecutionException;
 
 import communication.DC;
 import communication.DataCarrier;
@@ -45,14 +48,13 @@ public class RequestSender extends ClientConnectionManager {
     public DataCarrier addContact(String userName){
         DataCarrier<String> dataCarrier = new DataCarrier<>(DC.ADD_CONTACT, userName, true);
 
-        return sendRequest(dataCarrier);
+        return sendRequestUsingAsyncTask(dataCarrier);
     }
 
     public DataCarrier removeContact(String userName){
         DataCarrier<String> dataCarrier = new DataCarrier<>(DC.REMOVE_CONTACT, userName, true);
 
-        return sendRequest(dataCarrier);
+        return sendRequestUsingAsyncTask(dataCarrier);
     }
-
 
 }

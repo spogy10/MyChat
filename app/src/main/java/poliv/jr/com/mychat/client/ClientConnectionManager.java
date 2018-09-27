@@ -1,9 +1,11 @@
 package poliv.jr.com.mychat.client;
 
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import communication.DC;
@@ -142,17 +144,20 @@ public class ClientConnectionManager extends Client implements Runnable {
     }
 
     protected DataCarrier sendRequest(DataCarrier request){
-        DataCarrier response = new DataCarrier(DC.SERVER_CONNECTION_ERROR, false);
-        if(os == null || is == null) {
-            nNI.showToast("Not connected to server, please restart app");
-            return response;
-        }
-        try{
-            os.writeObject(request);
-            Log.d("Paul", "Request: "+request.getInfo()+" sent");
-            response = waitForResponse();
-            Log.d("Paul", "Response for "+request.getInfo()+" received");
-        } catch (IOException e) {
+        return sendRequest(request, true);
+    }
+
+    protected DataCarrier sendRequestUsingAsyncTask(DataCarrier request){
+        return sendRequestUsingAsyncTask(request, true);
+    }
+
+    protected DataCarrier sendRequestUsingAsyncTask(DataCarrier request, boolean responseRequired){
+        DataCarrier response = new DataCarrier(DC.GENERAL_ERROR, false);
+        try {
+            response = new RequestAsyncTask().execute(request, responseRequired).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
             e.printStackTrace();
         }
 
@@ -263,5 +268,19 @@ public class ClientConnectionManager extends Client implements Runnable {
 
     public static void setnNI(NetworkNotificationInterface nNI) {
         ClientConnectionManager.nNI = nNI;
+    }
+
+
+
+
+
+
+    private class RequestAsyncTask extends AsyncTask<Object, Void, DataCarrier> {
+
+
+        @Override
+        protected DataCarrier doInBackground(Object... requests) {
+            return sendRequest((DataCarrier) requests[0], (boolean) requests[1]);
+        }
     }
 }

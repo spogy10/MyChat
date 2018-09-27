@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.concurrent.ExecutionException;
+
 import communication.DataCarrier;
 import poliv.jr.com.mychat.R;
 import poliv.jr.com.mychat.client.RequestSender;
@@ -50,21 +52,15 @@ public class AddContactDialog extends DialogFragment {
 
     private void okButtonOnCLick(){
         if( (editText.getText() != null) && (!editText.getText().toString().equals("")) ) {
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    RequestSender rs = RequestSender.getInstance();
-                    DataCarrier response = rs.addContact(editText.getText().toString());
+            RequestSender rs = RequestSender.getInstance();
+            DataCarrier response = rs.addContact(editText.getText().toString());
 
-                    if(RequestSender.responseCheck(response) && response.getData() != null && ( (Boolean) response.getData()) ){//todo add confirmation message
-                        OkDialog.setDialog(getFragmentManager(), getString(R.string.contact_added));
-                    }else {
-                        OkDialog.setDialog(getFragmentManager(), getString(R.string.error_adding_contact));
-                    }
-                }
-            });
-            t.setPriority(Thread.MIN_PRIORITY); t.start();
-            dismiss();
+            if(RequestSender.responseCheck(response) && response.getData() != null && ( (Boolean) response.getData()) ){//todo add confirmation message
+                OkDialog.setDialog(getFragmentManager(), getString(R.string.contact_added));
+            }else {
+                OkDialog.setDialog(getFragmentManager(), getString(R.string.error_adding_contact));
+            }
+        dismiss();
         }
     }
 }
