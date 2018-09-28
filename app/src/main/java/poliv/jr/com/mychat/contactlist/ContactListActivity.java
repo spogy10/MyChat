@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import model.Message;
@@ -16,8 +17,10 @@ import poliv.jr.com.mychat.client.RequestSender;
 import poliv.jr.com.mychat.client.listeners.ContactListListener;
 import poliv.jr.com.mychat.contactlist.adapter.ContactsViewAdapter;
 import poliv.jr.com.mychat.dialog.AddContactDialog;
+import poliv.jr.com.mychat.dialog.OkDialog;
+import poliv.jr.com.mychat.dialog.RemoveContactDialog;
 
-public class ContactListActivity extends AppCompatActivity implements ContactListListener {
+public class ContactListActivity extends AppCompatActivity implements ContactListListener, ContactsViewAdapter.OnLongPressContactItemListener {
 
 
     private RecyclerView recyclerView;
@@ -38,7 +41,6 @@ public class ContactListActivity extends AppCompatActivity implements ContactLis
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //todo: add contact
                 AddContactDialog addContactDialog = new AddContactDialog();
                 addContactDialog.show(getFragmentManager(), "");
             }
@@ -47,7 +49,7 @@ public class ContactListActivity extends AppCompatActivity implements ContactLis
         recyclerView = findViewById(R.id.rvContactList);
         LinearLayoutManager lm = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(lm);
-        adapter = new ContactsViewAdapter(this);
+        adapter = new ContactsViewAdapter(this, this);
         recyclerView.setAdapter(adapter);
 
     }
@@ -108,5 +110,14 @@ public class ContactListActivity extends AppCompatActivity implements ContactLis
     @Override
     public void messageReceived(Message receivedMessage) {
 
+    }
+
+    @Override
+    public void onLongPress(String userName, View itemView) { //turn itemView back white after dialog answer
+        Log.d("Paul", "remove: "+userName);
+        RemoveContactDialog dialog = new RemoveContactDialog();
+        dialog.setDialog(getFragmentManager(), userName, itemView);
+
+        //rs.removeContact(userName);
     }
 }

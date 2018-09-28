@@ -1,13 +1,16 @@
 package poliv.jr.com.mychat.contactlist.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.LinkedList;
@@ -21,10 +24,12 @@ public class ContactsViewAdapter extends RecyclerView.Adapter<ContactsViewAdapte
 
     private List<String> contactUserNames;
     private Context context;
+    private OnLongPressContactItemListener onLongPressContactItemListener;
 
-    public ContactsViewAdapter(Context context){
+    public ContactsViewAdapter(Context context, OnLongPressContactItemListener listener){
         contactUserNames = new LinkedList<>(MyChat.myUser.getContacts().keySet());
         this.context = context;
+        onLongPressContactItemListener = listener;
     }
 
     @NonNull
@@ -63,16 +68,18 @@ public class ContactsViewAdapter extends RecyclerView.Adapter<ContactsViewAdapte
 
         CircleImageView cvProfilePic;
         TextView tvContactName;
+        LinearLayout llContact;
 
 
         protected ViewHolder(View itemView) {
             super(itemView);
             cvProfilePic = itemView.findViewById(R.id.cvProfilePic);
             tvContactName = itemView.findViewById(R.id.tvContactName);
+            llContact = itemView.findViewById(R.id.llContact);
         }
 
         protected void onBindView(int position) {
-            String userName = contactUserNames.get(position);
+            final String userName = contactUserNames.get(position);
             tvContactName.setText(userName);
 
             if(MyChat.myUser.getContacts().get(userName)){//if user online
@@ -80,6 +87,20 @@ public class ContactsViewAdapter extends RecyclerView.Adapter<ContactsViewAdapte
             }else{
                 cvProfilePic.setBorderColor(ContextCompat.getColor(context, R.color.contact_offline));
             }
+
+            llContact.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    itemView.setBackgroundColor(Color.GRAY);
+                    onLongPressContactItemListener.onLongPress(userName, itemView);
+                    return true;
+                }
+            });
+
         }
+    }
+
+    public interface OnLongPressContactItemListener {
+        void onLongPress(String userName, View itemView);
     }
 }

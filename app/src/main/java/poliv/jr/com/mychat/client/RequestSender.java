@@ -32,7 +32,7 @@ public class RequestSender extends ClientConnectionManager {
         super();
     }
 
-    public DataCarrier loginUser(String userName, String password){ //todo try and put async task in this
+    public DataCarrier loginUser(String userName, String password){
         DataCarrier<String[]> dataCarrier = new DataCarrier<>(DC.LOGIN_USER, new String[]{userName, password}, true);
 
         return sendRequest(dataCarrier);
