@@ -124,6 +124,11 @@ public class LoginActivity extends AppCompatActivity {
         attemptLogin(true);
     }
 
+    private void autoSignInUser2(String error){
+        if(error.equals(getString(R.string.failed_to_login_user) +DC.ALREADY_LOGGED_IN))
+            autoSignInUser("poliverjr2", "poliverjr2");
+    }
+
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -227,6 +232,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void displayError(String error){
         OkDialog.setDialog(getFragmentManager(), error);
+        autoSignInUser2(error);
     }
 
     /**

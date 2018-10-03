@@ -49,17 +49,25 @@ public class AddContactDialog extends DialogFragment {
         return builder.create();
     }
 
-    private void okButtonOnCLick(){ //todo: java.lang.IllegalStateException: Fragment already added: OkDialog
+    private void okButtonOnCLick(){
         if( (editText.getText() != null) && (!editText.getText().toString().equals("")) ) {
             String userName = editText.getText().toString();
             if(MyChat.myUser.getContacts().containsKey(userName)){
+                dismiss();
                 OkDialog.setDialog(getFragmentManager(), getString(R.string.contact_already_added));
+                return;
+            }
+
+            if(MyChat.myUser.getUserName().equals(userName)){
+                dismiss();
+                OkDialog.setDialog(getFragmentManager(), getString(R.string.cannot_add_yourself));
+                return;
             }
 
             RequestSender rs = RequestSender.getInstance();
             DataCarrier response = rs.addContact(userName);
 
-            if(RequestSender.responseCheck(response) && response.getData() != null && ( (Boolean) response.getData()) ){//todo add confirmation message
+            if(RequestSender.responseCheck(response) && response.getData() != null && ( (Boolean) response.getData()) ){
                 OkDialog.setDialog(getFragmentManager(), getString(R.string.contact_added));
             }else if(response.getInfo().equals(DC.USERNAME_DOES_NOT_EXIST)){
                 OkDialog.setDialog(getFragmentManager(), getString(R.string.user_does_not_exist));

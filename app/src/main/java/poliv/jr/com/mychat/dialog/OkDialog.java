@@ -26,7 +26,7 @@ public class OkDialog extends DialogFragment {
                 .setNeutralButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        dismiss();
                     }
                 })
                 .create();
