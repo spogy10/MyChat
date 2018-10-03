@@ -116,7 +116,7 @@ public class ContactListActivity extends AppCompatActivity implements ContactLis
     public void onLongPress(String userName, View itemView) { //turn itemView back white after dialog answer
         Log.d("Paul", "remove: "+userName);
         RemoveContactDialog dialog = new RemoveContactDialog();
-        dialog.setDialog(getFragmentManager(), userName, itemView);
+        dialog.setDialog(getFragmentManager(), userName, itemView, this);
 
         //rs.removeContact(userName);
     }

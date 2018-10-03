@@ -9,7 +9,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import communication.DC;
 import communication.DataCarrier;
+import poliv.jr.com.mychat.MyChat;
 import poliv.jr.com.mychat.R;
 import poliv.jr.com.mychat.client.RequestSender;
 
@@ -47,13 +49,20 @@ public class AddContactDialog extends DialogFragment {
         return builder.create();
     }
 
-    private void okButtonOnCLick(){
+    private void okButtonOnCLick(){ //todo: java.lang.IllegalStateException: Fragment already added: OkDialog
         if( (editText.getText() != null) && (!editText.getText().toString().equals("")) ) {
+            String userName = editText.getText().toString();
+            if(MyChat.myUser.getContacts().containsKey(userName)){
+                OkDialog.setDialog(getFragmentManager(), getString(R.string.contact_already_added));
+            }
+
             RequestSender rs = RequestSender.getInstance();
-            DataCarrier response = rs.addContact(editText.getText().toString());
+            DataCarrier response = rs.addContact(userName);
 
             if(RequestSender.responseCheck(response) && response.getData() != null && ( (Boolean) response.getData()) ){//todo add confirmation message
                 OkDialog.setDialog(getFragmentManager(), getString(R.string.contact_added));
+            }else if(response.getInfo().equals(DC.USERNAME_DOES_NOT_EXIST)){
+                OkDialog.setDialog(getFragmentManager(), getString(R.string.user_does_not_exist));
             }else {
                 OkDialog.setDialog(getFragmentManager(), getString(R.string.error_adding_contact));
             }

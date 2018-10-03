@@ -43,4 +43,5 @@ public class MyChat extends Application implements NetworkNotificationInterface 
             }
         });
     }
+
 }

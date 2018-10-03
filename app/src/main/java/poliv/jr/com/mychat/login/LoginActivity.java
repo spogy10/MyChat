@@ -94,16 +94,6 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         tvPassword = (EditText) findViewById(R.id.password);
-        /*tvPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });*/
 
         Button btSignIn = (Button) findViewById(R.id.btSignIn);
         btSignIn.setOnClickListener(new OnClickListener() {

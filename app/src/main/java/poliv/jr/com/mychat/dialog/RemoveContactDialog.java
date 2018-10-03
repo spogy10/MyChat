@@ -7,17 +7,23 @@ import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 
+import communication.DC;
 import communication.DataCarrier;
+import poliv.jr.com.mychat.MyChat;
 import poliv.jr.com.mychat.R;
 import poliv.jr.com.mychat.client.RequestSender;
+import poliv.jr.com.mychat.client.listeners.ContactAddedListener;
 
 public class RemoveContactDialog extends DialogFragment {
 
     String userName = "";
     View itemView;
+    ContactAddedListener cal;
+
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -33,6 +39,13 @@ public class RemoveContactDialog extends DialogFragment {
 
                         if(RequestSender.responseCheck(response) && response.getData() != null && ( (Boolean) response.getData()) ){//todo add confirmation message
                             OkDialog.setDialog(getFragmentManager(), getString(R.string.contact_removed));
+                        }else if(response.getInfo().equals(DC.USERNAME_DOES_NOT_EXIST)){
+
+                            MyChat.myUser.getContacts().remove(userName);
+                            OkDialog.setDialog(getFragmentManager(), getString(R.string.user_does_not_exist));
+                            Log.d("Paul", userName+" is now removed");
+                            if(cal != null)
+                                cal.onContactRemoved(userName);
                         }else {
                             OkDialog.setDialog(getFragmentManager(), getString(R.string.error_removing_contact));
                         }
@@ -57,9 +70,10 @@ public class RemoveContactDialog extends DialogFragment {
         super.onDismiss(dialog);
     }
 
-    public void setDialog(FragmentManager fragmentManager, String userName, View itemView) {
+    public void setDialog(FragmentManager fragmentManager, String userName, View itemView, @Nullable ContactAddedListener cal) {
         this.userName = userName;
         this.itemView = itemView;
+        this.cal = cal;
         show(fragmentManager, "");
     }
 }
