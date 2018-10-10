@@ -1,5 +1,6 @@
 package poliv.jr.com.mychat.contactlist;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -13,6 +14,7 @@ import android.view.View;
 import model.Message;
 import poliv.jr.com.mychat.MyChat;
 import poliv.jr.com.mychat.R;
+import poliv.jr.com.mychat.chat.ChatActivity;
 import poliv.jr.com.mychat.client.RequestSender;
 import poliv.jr.com.mychat.client.listeners.ContactListListener;
 import poliv.jr.com.mychat.contactlist.adapter.ContactsViewAdapter;
@@ -20,7 +22,7 @@ import poliv.jr.com.mychat.dialog.AddContactDialog;
 import poliv.jr.com.mychat.dialog.OkDialog;
 import poliv.jr.com.mychat.dialog.RemoveContactDialog;
 
-public class ContactListActivity extends AppCompatActivity implements ContactListListener, ContactsViewAdapter.OnLongPressContactItemListener {
+public class ContactListActivity extends AppCompatActivity implements ContactListListener, ContactsViewAdapter.OnLongPressContactItemListener, ContactsViewAdapter.OnClickContactItemListener {
 
 
     private RecyclerView recyclerView;
@@ -49,7 +51,7 @@ public class ContactListActivity extends AppCompatActivity implements ContactLis
         recyclerView = findViewById(R.id.rvContactList);
         LinearLayoutManager lm = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(lm);
-        adapter = new ContactsViewAdapter(this, this);
+        adapter = new ContactsViewAdapter(this, this, this);
         recyclerView.setAdapter(adapter);
 
     }
@@ -113,11 +115,17 @@ public class ContactListActivity extends AppCompatActivity implements ContactLis
     }
 
     @Override
-    public void onLongPress(String userName, View itemView) { //turn itemView back white after dialog answer
+    public void onLongPress(String userName, View itemView) {
         Log.d("Paul", "remove: "+userName);
         RemoveContactDialog dialog = new RemoveContactDialog();
         dialog.setDialog(getFragmentManager(), userName, itemView, this);
+    }
 
-        //rs.removeContact(userName);
+    @Override
+    public void onClick(String userName) {
+        Intent intent = new Intent(ContactListActivity.this, ChatActivity.class);
+        intent.putExtra(ChatActivity.CONTACT_NAME, userName);
+        startActivity(intent);
+
     }
 }

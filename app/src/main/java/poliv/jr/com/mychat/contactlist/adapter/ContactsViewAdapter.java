@@ -25,11 +25,13 @@ public class ContactsViewAdapter extends RecyclerView.Adapter<ContactsViewAdapte
     private List<String> contactUserNames;
     private Context context;
     private OnLongPressContactItemListener onLongPressContactItemListener;
+    private OnClickContactItemListener onClickContactItemListener;
 
-    public ContactsViewAdapter(Context context, OnLongPressContactItemListener listener){
+    public ContactsViewAdapter(Context context, OnLongPressContactItemListener listener, OnClickContactItemListener onClickContactItemListener){
         contactUserNames = new LinkedList<>(MyChat.myUser.getContacts().keySet());
         this.context = context;
         onLongPressContactItemListener = listener;
+        this.onClickContactItemListener = onClickContactItemListener;
     }
 
     @NonNull
@@ -97,10 +99,21 @@ public class ContactsViewAdapter extends RecyclerView.Adapter<ContactsViewAdapte
                 }
             });
 
+            llContact.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onClickContactItemListener.onClick(userName);
+                }
+            });
+
         }
     }
 
     public interface OnLongPressContactItemListener {
         void onLongPress(String userName, View itemView);
+    }
+
+    public interface OnClickContactItemListener{
+        void onClick(String userName);
     }
 }
