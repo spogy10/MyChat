@@ -70,6 +70,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText tvPassword;
     private View mProgressView;
     private View mLoginFormView;
+    private int autoSignInAttempts = 0; //todo: take out
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +126,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void autoSignInUser2(String error){ //todo: do not leave this in
+        autoSignInAttempts++;
         if(error.equals(getString(R.string.failed_to_login_user) +DC.ALREADY_LOGGED_IN))
             autoSignInUser("poliverjr2", "poliverjr2");
     }
@@ -232,7 +234,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private void displayError(String error){
         OkDialog.setDialog(getFragmentManager(), error);
-        autoSignInUser2(error);
+        if(autoSignInAttempts < 1)
+            autoSignInUser2(error);
     }
 
     /**

@@ -36,12 +36,14 @@ public class OkDialog extends DialogFragment {
     public static void setDialog(FragmentManager fragmentManager, String message) {
         Bundle args = new Bundle();
         args.putString("message", message);
-        try{
-            dialog.setArguments(args);
-        }catch (Exception e){
-            e.printStackTrace();
+        if(dialog.isAdded())
+            dialog.dismiss();
+        if(dialog.getArguments() != null){
             dialog.getArguments().putAll(args);
+        }else{
+            dialog.setArguments(args);
         }
+
 
         dialog.show(fragmentManager, "");
     }

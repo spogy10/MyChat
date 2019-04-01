@@ -1,0 +1,5 @@
+1. Have app logout of server gracefully (even when crashed) or have app determine if it already has a connection to server and reconnect.
+
+2. implement logout function
+
+3. implement messaging function
