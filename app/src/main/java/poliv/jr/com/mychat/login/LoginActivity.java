@@ -118,13 +118,13 @@ public class LoginActivity extends AppCompatActivity {
         autoSignInUser("poliver", "poliver");
     }
 
-    private void autoSignInUser(String userName, String password) {
+    private void autoSignInUser(String userName, String password) { //todo: do not leave this in
         tvUserName.setText(userName);
         tvPassword.setText(password);
         attemptLogin(true);
     }
 
-    private void autoSignInUser2(String error){
+    private void autoSignInUser2(String error){ //todo: do not leave this in
         if(error.equals(getString(R.string.failed_to_login_user) +DC.ALREADY_LOGGED_IN))
             autoSignInUser("poliverjr2", "poliverjr2");
     }
